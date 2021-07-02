@@ -1,5 +1,6 @@
 require("eyesy")
 
+NUM_SAMPLES = 256
 w = of.getWidth()
 h = of.getHeight()
 w2 = w / 2
