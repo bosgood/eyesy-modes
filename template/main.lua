@@ -10,7 +10,7 @@ h4 = h / 4
 c = glm.vec3(w2, h2, 0)
 
 function setup()
-    print("New Mode")
+  print("New Mode")
 end
 
 function update()

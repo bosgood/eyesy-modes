@@ -21,36 +21,36 @@ AMPLITUDE = 1500
 dir = 1
 
 function setup()
-    print("LowResNoiseScope")
+  print("LowResNoiseScope")
 end
 
 function update()
 end
 
 function draw()
-    scale = AMPLITUDE * knob1
-    time = (time + (dir * knob3)) % 255
-    if time == 0 then
-        dir = dir * -1
-    end
-    barWidth = math.floor(w / NUM_SAMPLES)
+  scale = AMPLITUDE * knob1
+  time = (time + (dir * knob3)) % 255
+  if time == 0 then
+    dir = dir * -1
+  end
+  barWidth = math.floor(w / NUM_SAMPLES)
 
-    for i=1,NUM_SAMPLES do
-        color = of.Color()
-        noise = of.noise(i, knob4)
-        color:setHsb(knob2 * 100 * noise, time, 255)
-        amp = inL[i]
-        if i % 2 == 0 then
-            amp = inR[i]
-        end
-        drawSegment(i * barWidth, h2, barWidth, scale, color, amp)
+  for i=1,NUM_SAMPLES do
+    color = of.Color()
+    noise = of.noise(i, knob4)
+    color:setHsb(knob2 * 100 * noise, time, 255)
+    amp = inL[i]
+    if i % 2 == 0 then
+      amp = inR[i]
     end
+    drawSegment(i * barWidth, h2, barWidth, scale, color, amp)
+  end
 end
 
 function drawSegment(x, y, width, scale, color, amp)
-    of.setColor(color)
-    of.beginShape()
-        height = amp * scale
-        of.drawRectangle(x, y, width, height * 0.55)
-    of.endShape()
+  of.setColor(color)
+  of.beginShape()
+    height = amp * scale
+    of.drawRectangle(x, y, width, height * 0.55)
+  of.endShape()
 end
