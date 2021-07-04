@@ -4,8 +4,8 @@
 -- knob1: dot render probability
 -- knob2: dot bias towards center
 -- knob3: dot count
--- knob4: audio amplitude effect on circle scale
--- knob5: limits audio jump range, and modifies visualization brightness
+-- knob4: audio amplitude effect on circle scale, and audio jump range
+-- knob5: brightness
 
 -- Code heavily inspired by and ported from Javascript at:
 -- https://github.com/georgedoescode/generative-utils/blob/master/src/createQtGrid.js
@@ -65,6 +65,8 @@ end
 
 local function createQtGrid(override)
   local opts = {
+    x = 0,
+    y = 0,
     width = W,
     height = H,
     points = {},
@@ -78,7 +80,7 @@ local function createQtGrid(override)
   end
 
   -- Instantiate and populate Quadtree with points
-  local qt = Quadtree:new(glm.vec4(0, 0, opts.width, opts.height), opts.maxQtObjects, opts.maxQtLevels)
+  local qt = Quadtree:new(glm.vec4(opts.x, opts.y, opts.width, opts.height), opts.maxQtObjects, opts.maxQtLevels)
   for _, v in ipairs(opts.points) do
     qt:insert(v)
   end
@@ -140,17 +142,18 @@ function update()
   end
 
   Grid = createQtGrid{
-    width = W,
-    height = H,
+    x = 3,
+    y = 3,
+    width = W - 20,
+    height = H - 6,
     points = Dots,
-    gap = 1
+    gap = 3,
   }
 
   -- Allow amplitude to seek towards actual value but
   -- prevent large jumps
   local actualAmplitude = gen.averageAmplitude()
-  local allowedRange = MaxRange * knob5
-  local ampDifference = math.abs(math.abs(actualAmplitude) - math.abs(LastAmplitude))
+  local allowedRange = MaxRange * knob4
 
   if actualAmplitude > LastAmplitude then
     LastAmplitude = math.min(LastAmplitude + allowedRange, actualAmplitude)
