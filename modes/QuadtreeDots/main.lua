@@ -4,8 +4,8 @@
 -- knob1: dot render probability
 -- knob2: dot bias towards center
 -- knob3: dot count
--- knob4:
--- knob5:
+-- knob4: audio amplitude effect on circle scale
+-- knob5: limits audio jump range
 
 -- Code heavily inspired by and ported from Javascript at:
 -- https://github.com/georgedoescode/generative-utils/blob/master/src/createQtGrid.js
@@ -23,12 +23,15 @@ W4 = W / 4
 H4 = H / 4
 C = glm.vec3(W2, H2, 0)
 
-Time = 0
+Time1 = 0
+Time2 = 0
 Dots = {}
 CenterBias = 1
 NumDots = 100
 DotSize = 10
 Grid = nil
+LastAmplitude = 0
+MaxRange = 0.1
 
 local function getGridArea(bounds, colSize, rowSize)
   return {
@@ -112,7 +115,8 @@ function setup()
 end
 
 function update()
-  Time = (Time + 1) % 1000
+  Time1 = (Time1 + 1) % 360
+  Time2 = (Time2 + 1) % 255
 
   -- Always force a refresh after dots updated, otherwise
   -- there is a delay where the screen is blank until
@@ -136,24 +140,45 @@ function update()
   end
 
   Grid = createQtGrid{
-    width = W - 5,
-    height = H - 5,
+    width = W,
+    height = H,
     points = Dots,
     gap = 1
   }
+
+  -- Allow amplitude to seek towards actual value but
+  -- prevent large jumps
+  local actualAmplitude = gen.averageAmplitude()
+  local allowedRange = MaxRange * knob5
+  local ampDifference = math.abs(math.abs(actualAmplitude) - math.abs(LastAmplitude))
+
+  if actualAmplitude > LastAmplitude then
+    LastAmplitude = math.min(LastAmplitude + allowedRange, actualAmplitude)
+  else
+    LastAmplitude = math.max(LastAmplitude - allowedRange, actualAmplitude)
+  end
 end
 
 function draw()
-  of.fill()
-  of.setColor(255, 255, 255)
-  for _, v in ipairs(Dots) do
-    of.drawCircle(v.x, v.y, v.z)
-  end
+  -- -- Draw scatterplot dots
+  -- of.fill()
+  -- of.setColor(255, 255, 255)
+  -- for _, v in ipairs(Dots) do
+  --   of.drawCircle(v.x, v.y, v.z)
+  -- end
 
   -- Visualize a Quadtree grid over the scene
   of.noFill()
-  of.setColor(255, 255, 255)
+  of.setColor(255, 255, 255, math.sin(gen.toRadians(Time1)) * 255)
   for _, area in ipairs(Grid.areas) do
     of.drawRectangle(area.x, area.y, area.width, area.height)
+  end
+
+  -- Render circles on the active quadtree nodes
+  of.fill()
+  of.setColor(of.Color.fromHsb(Time2, 255, 255, 50))
+  for _, area in ipairs(Grid.areas) do
+    local rad = area.width * (math.abs(LastAmplitude) * knob4 * 500)
+    of.drawCircle(area.x - rad, area.y - rad, rad)
   end
 end
