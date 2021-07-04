@@ -11,8 +11,8 @@ function Generative.randomBias(min, max, bias, influence)
     influence = 0.5
   end
 
-  local base = math.random(min * 100, max * 100) / 100
-  local mix = (math.random(0, 100) / 100) * influence
+  local base = of.random(min, max)
+  local mix = (of.random(1)) * influence
   return base * (1 - mix) + bias * mix
 end
 
