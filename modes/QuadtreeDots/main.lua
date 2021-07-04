@@ -5,7 +5,7 @@
 -- knob2: dot bias towards center
 -- knob3: dot count
 -- knob4: audio amplitude effect on circle scale
--- knob5: limits audio jump range
+-- knob5: limits audio jump range, and modifies visualization brightness
 
 -- Code heavily inspired by and ported from Javascript at:
 -- https://github.com/georgedoescode/generative-utils/blob/master/src/createQtGrid.js
@@ -169,16 +169,16 @@ function draw()
 
   -- Visualize a Quadtree grid over the scene
   of.noFill()
-  of.setColor(255, 255, 255, math.sin(gen.toRadians(Time1)) * 100)
+  of.setColor(255, 255, 255, math.sin(gen.toRadians(Time1)) * 100 * knob5)
   for _, area in ipairs(Grid.areas) do
     of.drawRectangle(area.x, area.y, area.width, area.height)
   end
 
   -- Render circles on the active quadtree nodes
   of.fill()
-  of.setColor(of.Color.fromHsb(Time2, 255, 255, 50))
+  of.setColor(of.Color.fromHsb(Time2, 255, 255, 175 * knob5))
   for _, area in ipairs(Grid.areas) do
     local rad = area.width * (math.abs(LastAmplitude) * knob4 * 500)
-    of.drawCircle(area.x - rad, area.y - rad, rad)
+    of.drawCircle(area.x - area.width / 2, area.y - area.height / 2, rad)
   end
 end
