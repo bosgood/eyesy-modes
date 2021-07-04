@@ -31,7 +31,7 @@ NumDots = 100
 DotSize = 10
 Grid = nil
 LastAmplitude = 0
-MaxRange = 0.1
+MaxRange = 0.0005
 
 local function getGridArea(bounds, colSize, rowSize)
   return {
@@ -169,7 +169,7 @@ function draw()
 
   -- Visualize a Quadtree grid over the scene
   of.noFill()
-  of.setColor(255, 255, 255, math.sin(gen.toRadians(Time1)) * 255)
+  of.setColor(255, 255, 255, math.sin(gen.toRadians(Time1)) * 100)
   for _, area in ipairs(Grid.areas) do
     of.drawRectangle(area.x, area.y, area.width, area.height)
   end
