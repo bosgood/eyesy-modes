@@ -117,7 +117,7 @@ function Quadtree:insert(area)
 
     -- Add all objects to their corresponding subnode
     for _, obj in ipairs(self.objects) do
-      local indexes = self.getIndex(obj)
+      local indexes = self:getIndex(obj)
       for _, idx in ipairs(indexes) do
         table.insert(self.nodes[idx], obj)
       end
@@ -138,7 +138,7 @@ function Quadtree:retrieve(area)
   -- If subnodes exist, retrieve their objects
   if #self.nodes > 0 then
     for _, idx in ipairs(indexes) do
-      local objs = indexes[idx].retrieve(area)
+      local objs = indexes[idx]:retrieve(area)
       local allObjs = {}
       for _, obj in ipairs(foundObjs) do
         table.insert(allObjs, obj)
