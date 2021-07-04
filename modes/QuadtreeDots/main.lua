@@ -1,9 +1,9 @@
 -- QuadtreeDots
 -- Scattered shape renderer based on a quadtree pattern
 --
--- knob1: dot render frequency
--- knob2:
--- knob3:
+-- knob1: dot render probability
+-- knob2: dot bias towards center
+-- knob3: dot count
 -- knob4:
 -- knob5:
 
@@ -25,11 +25,10 @@ C = glm.vec3(W2, H2, 0)
 
 Time = 0
 Dots = {}
-CenterBias = 0.75
-DotRenderFrequency = 10
-NumDots = 50
-Tree = Quadtree:new(glm.vec4(0, 0, 0, 0))
+CenterBias = 1
+NumDots = 100
 DotSize = 10
+Grid = nil
 
 local function getGridArea(bounds, colSize, rowSize)
   return {
@@ -114,15 +113,34 @@ end
 
 function update()
   Time = (Time + 1) % 1000
-  local freq = knob1 * DotRenderFrequency
 
-  if math.floor(Time % freq) == 0 then
-    for i = 1, NumDots do
-      local locX = gen.randomBias(0, W, W2, CenterBias)
-      local locY = gen.randomBias(0, W, W2, CenterBias)
+  -- Always force a refresh after dots updated, otherwise
+  -- there is a delay where the screen is blank until
+  -- the next probabilistic event
+  local numDotsUpdated = false
+  local numDots = math.floor(NumDots * knob3)
+  if #Dots ~= numDots then
+    Dots = {}
+    numDotsUpdated = true
+  end
+
+  -- Update dot location probabilistically
+  local refreshProbability = knob1
+  if numDotsUpdated or gen.willHappen(refreshProbability) then
+    for i = 1, numDots do
+      local calcCenterBias = CenterBias * knob2
+      local locX = gen.randomBias(0, W, W2, calcCenterBias)
+      local locY = gen.randomBias(0, W, W2, calcCenterBias)
       Dots[i] = glm.vec4(locX, locY, DotSize, DotSize)
     end
   end
+
+  Grid = createQtGrid{
+    width = W - 5,
+    height = H - 5,
+    points = Dots,
+    gap = 1
+  }
 end
 
 function draw()
@@ -135,13 +153,7 @@ function draw()
   -- Visualize a Quadtree grid over the scene
   of.noFill()
   of.setColor(255, 255, 255)
-  local grid = createQtGrid{
-    width = W - 5,
-    height = H - 5,
-    points = Dots,
-    gap = 1
-  }
-  for _, area in ipairs(grid.areas) do
+  for _, area in ipairs(Grid.areas) do
     of.drawRectangle(area.x, area.y, area.width, area.height)
   end
 end
