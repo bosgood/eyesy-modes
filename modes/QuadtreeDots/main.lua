@@ -29,30 +29,7 @@ CenterBias = 0.75
 DotRenderFrequency = 10
 NumDots = 50
 Tree = Quadtree:new(glm.vec4(0, 0, 0, 0))
-
-function setup()
-  print("QuadtreeDots")
-end
-
-function update()
-  Time = (Time + 1) % 1000
-  local freq = knob1 * DotRenderFrequency
-
-  if math.floor(Time % freq) == 0 then
-    for i = 1, NumDots do
-      local locX = gen.randomBias(0, W, W2, CenterBias)
-      local locY = gen.randomBias(0, W, W2, CenterBias)
-      Dots[i] = glm.vec2(locX, locY)
-    end
-  end
-end
-
-function draw()
-  of.setColor(255, 255, 255)
-  for _, v in ipairs(Dots) do
-    of.drawCircle(v, 10)
-  end
-end
+DotSize = 10
 
 local function getGridArea(bounds, colSize, rowSize)
   return {
@@ -67,7 +44,7 @@ local function getGridArea(bounds, colSize, rowSize)
   }
 end
 
-local function getIndividualQtNodes(nodes)
+local function getIndividualQtNodes(root)
   local individualNodes = {}
 
   local function getIndividualQtNodesInner(node)
@@ -79,6 +56,7 @@ local function getIndividualQtNodes(nodes)
       end
     end
   end
+  getIndividualQtNodesInner(root)
 
   return individualNodes
 end
@@ -89,16 +67,16 @@ local function createQtGrid(override)
     height = H,
     points = {},
     gap = 0,
-    maxQtObjects = 10,
-    maxQtLevels = 4,
+    maxQtObjects = 4,
+    maxQtLevels = 10,
   }
 
   for k, v in pairs(override) do
     opts[k] = v
   end
 
+  -- Instantiate and populate Quadtree with points
   local qt = Quadtree:new(glm.vec4(0, 0, opts.width, opts.height), opts.maxQtObjects, opts.maxQtLevels)
-
   for _, v in ipairs(opts.points) do
     qt:insert(v)
   end
@@ -108,7 +86,8 @@ local function createQtGrid(override)
   local rowSize = opts.height / maxSubdivisions
 
   local areas = {}
-  for _, node in ipairs(getIndividualQtNodes(qt)) do
+  local nodes = getIndividualQtNodes(qt)
+  for _, node in ipairs(nodes) do
     local gridArea = getGridArea(node.bounds, colSize, rowSize)
     table.insert(areas, {
       x = node.bounds.x + opts.gap,
@@ -127,4 +106,42 @@ local function createQtGrid(override)
     rows = maxSubdivisions,
     areas = areas,
   }
+end
+
+function setup()
+  print("QuadtreeDots")
+end
+
+function update()
+  Time = (Time + 1) % 1000
+  local freq = knob1 * DotRenderFrequency
+
+  if math.floor(Time % freq) == 0 then
+    for i = 1, NumDots do
+      local locX = gen.randomBias(0, W, W2, CenterBias)
+      local locY = gen.randomBias(0, W, W2, CenterBias)
+      Dots[i] = glm.vec4(locX, locY, DotSize, DotSize)
+    end
+  end
+end
+
+function draw()
+  of.fill()
+  of.setColor(255, 255, 255)
+  for _, v in ipairs(Dots) do
+    of.drawCircle(v.x, v.y, v.z)
+  end
+
+  -- Visualize a Quadtree grid over the scene
+  of.noFill()
+  of.setColor(255, 255, 255)
+  local grid = createQtGrid{
+    width = W - 5,
+    height = H - 5,
+    points = Dots,
+    gap = 1
+  }
+  for _, area in ipairs(grid.areas) do
+    of.drawRectangle(area.x, area.y, area.width, area.height)
+  end
 end
