@@ -1,9 +1,9 @@
 -- BarcodeScanline
 --
--- knob1:
--- knob2:
--- knob3:
--- knob4:
+-- knob1: COEF_SINE_TRANSFORM
+-- knob2: COEF_BAR_WIDTH
+-- knob3: COEF_MOVEMENT_WIGGLE
+-- knob4: COEF_SINE_BAR_SATURATION
 -- knob5:
 
 -- require("eyesy")
@@ -27,8 +27,9 @@ COEF_MOVEMENT_WIGGLE = 0.75
 COEF_MOVEMENT_SCROLL = 0.10
 COEF_TRANSLATE_VEC_BIAS = 0.25
 COEF_PCT_CORRECT_BARS_OFFSCREEN = 0.25
-COEF_SINE_INFLUENCE = 0.1
-COEF_SINE_TRANSFORM = 0.25
+COEF_SINE_INFLUENCE = 0.05
+COEF_SINE_TRANSFORM = 0.05
+COEF_SINE_BAR_SATURATION = 3
 
 -- Mode state
 Bars = {}
@@ -114,12 +115,20 @@ local function drawBar(i, rect)
   end
 
   of.beginShape()
-    -- of.drawRectangle(rect)
-
+    -- Cut my sine into pieces
+    -- This is my last resort
     local steps = rect.height / 3
     local step = rect.height / steps
     for x = 0, steps do
+      local color = of.Color.fromHsb(
+        x + SinTransform % 255,
+        COEF_SINE_BAR_SATURATION,
+        COLOR_WHITE:getBrightness()
+      )
+      of.setColor(color)
+
       local wavePoint = math.sin(x + SinTransform) * COEF_SINE_INFLUENCE * SinTransform
+      -- A sine wave the width of each bar
       local v1 = glm.vec2(rect.x + wavePoint, step * x)
       local v2 = glm.vec2(rect.x + wavePoint + rect.width, step * x)
       of.vertex(v1)
