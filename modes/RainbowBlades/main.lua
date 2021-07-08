@@ -1,4 +1,4 @@
--- RainbowSine
+-- RainbowBlades
 --
 -- knob1:
 -- knob2:
@@ -8,6 +8,7 @@
 
 -- require("eyesy")
 local color = require("color")
+local lfo = require("lfo")
 
 NUM_SAMPLES = 256
 W = of.getWidth()
@@ -19,11 +20,15 @@ H4 = H / 4
 C = glm.vec3(W2, H2, 0)
 
 -- Mode constants
+COLOR_BLACK = of.Color.fromHsb(116, 0, 10)
 COEF_BAR_WIDTH = 30
-COEF_ROTATION_DEG = 0
+COEF_ROTATION_DEG = 45
 COEF_NUM_BARS = 25
 COEF_COLOR_SATURATION = 150
-COEF_TIME_ACCELERATION = 10
+COEF_TIME_ACCELERATION = 15
+COEF_SINE_SLICES = 15
+COEF_SINE_SLICE_WIDTH = 5
+COEF_BAR_OPACITY = 0
 PALETTE = {
   of.Color.fromHsb(color.map360(360), color.map100(67), color.map100(98), COEF_COLOR_SATURATION),
   of.Color.fromHsb(color.map360(339), color.map100(68), color.map100(90), COEF_COLOR_SATURATION),
@@ -44,6 +49,7 @@ Bars = {}
 ColorRotate = 0
 Time = 0
 Acceleration = 10
+SineLFO = lfo.sine(1000, 10)
 
 local function populateBars()
   for i = 0, COEF_NUM_BARS - 1 do
@@ -56,7 +62,7 @@ local function populateBars()
 end
 
 function setup()
-  print("RainbowSine")
+  print("RainbowBlades")
   populateBars()
 end
 
@@ -86,11 +92,31 @@ function update()
 end
 
 function draw()
+  of.setBackgroundColor(COLOR_BLACK)
   of.pushMatrix()
     of.rotateDeg(COEF_ROTATION_DEG)
-    for _, bar in ipairs(Bars) do
-      of.setColor(bar.color)
+    of.translate(-of.getWidth() / 20, -of.getHeight() / 2)
+
+    for i, bar in ipairs(Bars) do
+      of.setColor(color.withAlpha(bar.color, COEF_BAR_OPACITY))
       of.drawRectangle(bar.rect)
+
+      local path = of.Path()
+      path:moveTo(bar.rect.x, bar.rect.y)
+      path:setColor(bar.color)
+      path:setFillColor(bar.color)
+      path:setFilled(true)
+
+      for j = 1, COEF_SINE_SLICES do
+        local to = glm.vec2(
+          bar.rect.x + SineLFO(of.getElapsedTimeMillis()),
+          (bar.rect.height / COEF_SINE_SLICES) * j
+        )
+        path:curveTo(to)
+      end
+
+      path:close()
+      path:draw()
     end
   of.popMatrix()
 end
