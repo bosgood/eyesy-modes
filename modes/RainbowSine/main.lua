@@ -23,6 +23,7 @@ COEF_BAR_WIDTH = 30
 COEF_ROTATION_DEG = 0
 COEF_NUM_BARS = 25
 COEF_COLOR_SATURATION = 150
+COEF_TIME_ACCELERATION = 10
 PALETTE = {
   of.Color.fromHsb(color.map360(360), color.map100(67), color.map100(98), COEF_COLOR_SATURATION),
   of.Color.fromHsb(color.map360(339), color.map100(68), color.map100(90), COEF_COLOR_SATURATION),
@@ -40,6 +41,9 @@ PALETTE = {
 
 -- Mode state
 Bars = {}
+ColorRotate = 0
+Time = 0
+Acceleration = 10
 
 local function populateBars()
   for i = 0, COEF_NUM_BARS - 1 do
@@ -57,15 +61,27 @@ function setup()
 end
 
 function update()
+  Time = Time + 1
+
   -- Repopulate bars if quantity is changed
   if #Bars ~= COEF_NUM_BARS then
     populateBars()
   end
 
+  -- It's a sine of the times
+  local accMod = COEF_TIME_ACCELERATION * math.sin(Time)
+  Acceleration = math.floor(Acceleration + accMod)
+  -- print(COEF_TIME_ACCELERATION * math.sin(Time))
+  if Time % of.clamp(Acceleration, 10, 20) == 0 then
+    ColorRotate = ColorRotate + 1
+  end
+
   for i, bar in ipairs(Bars) do
+    bar.rect.height = of.getHeight()
     -- local lerpColor = of.lerp(0, 255, #Bars) * i
     -- bar.color:setHue(lerpColor)
-    bar.color = PALETTE[(i % #PALETTE) + 1]
+    bar.color = PALETTE[((i + ColorRotate) % #PALETTE) + 1]
+    -- bar.color:setBrightness(Time % 255)
   end
 end
 
