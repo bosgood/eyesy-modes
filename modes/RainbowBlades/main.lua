@@ -28,7 +28,7 @@ COEF_COLOR_SATURATION = 150
 COEF_TIME_ACCELERATION = 15
 COEF_SINE_SLICES = 15
 COEF_SINE_SLICE_WIDTH = 5
-COEF_BAR_OPACITY = 0
+COEF_BAR_OPACITY = 50
 PALETTE = {
   of.Color.fromHsb(color.map360(360), color.map100(67), color.map100(98), COEF_COLOR_SATURATION),
   of.Color.fromHsb(color.map360(339), color.map100(68), color.map100(90), COEF_COLOR_SATURATION),
@@ -99,7 +99,20 @@ function draw()
 
     for _, bar in ipairs(Bars) do
       of.setColor(color.withAlpha(bar.color, COEF_BAR_OPACITY))
-      of.drawRectangle(bar.rect)
+
+      of.drawRectRounded(
+        of.Rectangle(
+          bar.rect.x,
+          bar.rect.y,
+          of.clamp(
+            (bar.rect.width / 3) + SineLFO(of.getElapsedTimeMillis()),
+            0,
+            bar.rect.width * 0.75
+          ),
+          bar.rect.height
+        ),
+        10
+      )
 
       local path = of.Path()
       path:moveTo(bar.rect.x, bar.rect.y)
