@@ -49,7 +49,7 @@ Bars = {}
 ColorRotate = 0
 Time = 0
 Acceleration = 10
-SineLFO = lfo.sine(1000, 10)
+SineLFO = lfo.sineGenerator(1000, 10)
 
 local function populateBars()
   for i = 0, COEF_NUM_BARS - 1 do
@@ -97,7 +97,7 @@ function draw()
     of.rotateDeg(COEF_ROTATION_DEG)
     of.translate(-of.getWidth() / 20, -of.getHeight() / 2)
 
-    for i, bar in ipairs(Bars) do
+    for _, bar in ipairs(Bars) do
       of.setColor(color.withAlpha(bar.color, COEF_BAR_OPACITY))
       of.drawRectangle(bar.rect)
 
