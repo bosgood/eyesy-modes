@@ -77,29 +77,26 @@ function update()
   -- It's a sine of the times
   local accMod = COEF_TIME_ACCELERATION * math.sin(Time)
   Acceleration = math.floor(Acceleration + accMod)
-  -- print(COEF_TIME_ACCELERATION * math.sin(Time))
   if Time % of.clamp(Acceleration, 10, 20) == 0 then
     ColorRotate = ColorRotate + 1
   end
 
   for i, bar in ipairs(Bars) do
     bar.rect.height = of.getHeight()
-    -- local lerpColor = of.lerp(0, 255, #Bars) * i
-    -- bar.color:setHue(lerpColor)
     bar.color = PALETTE[((i + ColorRotate) % #PALETTE) + 1]
-    -- bar.color:setBrightness(Time % 255)
   end
 end
 
 function draw()
   of.setBackgroundColor(COLOR_BLACK)
   of.pushMatrix()
+    -- Skew entire canvas diagonally
     of.rotateDeg(COEF_ROTATION_DEG)
     of.translate(-of.getWidth() / 20, -of.getHeight() / 2)
 
     for _, bar in ipairs(Bars) do
+      -- Bounding rectangles drawn behind in with opacity
       of.setColor(color.withAlpha(bar.color, COEF_BAR_OPACITY))
-
       of.drawRectRounded(
         of.Rectangle(
           bar.rect.x,
@@ -107,13 +104,14 @@ function draw()
           of.clamp(
             (bar.rect.width / 3) + SineLFO(of.getElapsedTimeMillis()),
             0,
-            bar.rect.width * 0.75
+            bar.rect.width * 0.5
           ),
           bar.rect.height
         ),
         10
       )
 
+      -- Sharp-edged dagger shapes drawn as paths over rectangles
       local path = of.Path()
       path:moveTo(bar.rect.x, bar.rect.y)
       path:setColor(bar.color)
