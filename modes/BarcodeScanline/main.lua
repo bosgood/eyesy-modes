@@ -27,12 +27,15 @@ COEF_MOVEMENT_WIGGLE = 0.75
 COEF_MOVEMENT_SCROLL = 0.10
 COEF_TRANSLATE_VEC_BIAS = 0.25
 COEF_PCT_CORRECT_BARS_OFFSCREEN = 0.25
+COEF_SINE_INFLUENCE = 0.1
+COEF_SINE_TRANSFORM = 0.25
 
 -- Mode state
 Bars = {}
 TranslateVec = glm.vec2(0, 0)
 BarIndex = 1
 TranslateVecBias = glm.vec2(0, 0)
+SinTransform = 0
 
 function setup()
   print("BarcodeScanline")
@@ -69,6 +72,9 @@ function update()
   local numBarsOffscreenRight = 0
 
   for _, rect in ipairs(Bars) do
+    -- Resize with screen height
+    rect.height = of.getHeight()
+
     local wiggle = COEF_MOVEMENT_WIGGLE * gauss.randomGaussian()
     -- Simulate TV out of sync by introducing random lateral movement
     rect.x = rect.x + wiggle
@@ -79,7 +85,7 @@ function update()
     if rect.x < 0 then
       numBarsOffscreenLeft = numBarsOffscreenLeft + 1
     end
-    if rect.x > W then
+    if rect.x > of.getWidth() then
       numBarsOffscreenRight = numBarsOffscreenRight + 1
     end
   end
@@ -96,33 +102,37 @@ function update()
     TranslateVecBias = glm.vec2(0, TranslateVecBias.y)
   end
 
-  -- -- As the bars move offscreen, cycle the render start index
-  -- if Bars[#Bars].x > W then
-  --   BarIndex = (BarIndex % #Bars) + 1
-  -- end
+  -- Let the sine wave effect be modulated by a monotonically increasing value
+  SinTransform = SinTransform + COEF_SINE_TRANSFORM
 end
 
+-- Draws a barcode bar; can be either a rectangle or a wide sine wave
 local function drawBar(i, rect)
   -- Bar code coloring - skip bars matching bgcolor
-  if i % 2 == 1 then
-    of.drawRectangle(rect)
+  if i % 2 == 0 then
+    return
   end
+
+  of.beginShape()
+    -- of.drawRectangle(rect)
+
+    local steps = rect.height / 3
+    local step = rect.height / steps
+    for x = 0, steps do
+      local wavePoint = math.sin(x + SinTransform) * COEF_SINE_INFLUENCE * SinTransform
+      local v1 = glm.vec2(rect.x + wavePoint, step * x)
+      local v2 = glm.vec2(rect.x + wavePoint + rect.width, step * x)
+      of.vertex(v1)
+      of.vertex(v2)
+    end
+  of.endShape()
 end
 
 function draw()
   of.fill()
   of.setColor(COLOR_WHITE)
 
-  -- Allow render to start at arbitrary index in table
-  for i = BarIndex, #Bars do
-    local rect = Bars[i]
+  for i, rect in ipairs(Bars) do
     drawBar(i, rect)
-  end
-  -- But then loop around to paint the beginning afterwards
-  if BarIndex > 1 then
-    for i = 1, BarIndex-1 do
-      local rect = Bars[i]
-      drawBar(i, rect)
-    end
   end
 end
