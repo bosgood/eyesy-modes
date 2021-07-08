@@ -7,6 +7,7 @@
 -- knob5: COEF_ROTATION_DEG
 
 -- require("eyesy")
+local color = require("color")
 
 NUM_SAMPLES = 256
 W = of.getWidth()
@@ -17,32 +18,24 @@ W4 = W / 4
 H4 = H / 4
 C = glm.vec3(W2, H2, 0)
 
-local function map360(v)
-  return of.map(v, 0, 360, 0, 255, true)
-end
-
-local function map100(v)
-  return of.map(v, 0, 100, 0, 255, true)
-end
-
 -- Mode constants
 COEF_BAR_WIDTH = 30
 COEF_ROTATION_DEG = 0
 COEF_NUM_BARS = 25
 COEF_COLOR_SATURATION = 150
 PALETTE = {
-  of.Color.fromHsb(map360(360), map100(67), map100(98), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(339), map100(68), map100(90), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(288), map100(66), map100(86), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(255), map100(67), map100(95), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(228), map100(69), map100(96), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(208), map100(85), map100(90), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(188), map100(89), map100(75), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(162), map100(90), map100(72), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(131), map100(66), map100(75), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(85), map100(85), map100(79), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(42), map100(98), map100(98), COEF_COLOR_SATURATION),
-  of.Color.fromHsb(map360(27), map100(92), map100(99), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(360), color.map100(67), color.map100(98), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(339), color.map100(68), color.map100(90), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(288), color.map100(66), color.map100(86), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(255), color.map100(67), color.map100(95), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(228), color.map100(69), color.map100(96), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(208), color.map100(85), color.map100(90), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(188), color.map100(89), color.map100(75), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(162), color.map100(90), color.map100(72), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(131), color.map100(66), color.map100(75), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(85), color.map100(85), color.map100(79), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(42), color.map100(98), color.map100(98), COEF_COLOR_SATURATION),
+  of.Color.fromHsb(color.map360(27), color.map100(92), color.map100(99), COEF_COLOR_SATURATION),
 }
 
 -- Mode state
