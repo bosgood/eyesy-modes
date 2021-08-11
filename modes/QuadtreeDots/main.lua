@@ -10,7 +10,7 @@
 -- Code heavily inspired by and ported from Javascript at:
 -- https://github.com/georgedoescode/generative-utils/blob/master/src/createQtGrid.js
 
-require("eyesy")
+local compat = require("compat")
 local gen = require("generative")
 local Quadtree = require("quadtree")
 
@@ -30,7 +30,7 @@ CenterBias = 1
 NumDots = 100
 DotSize = 10
 Grid = nil
-LastAmplitude = 0
+LastAmplitude = 0.5
 MaxRange = 0.0005
 
 local function getGridArea(bounds, colSize, rowSize)
@@ -67,8 +67,8 @@ local function createQtGrid(override)
   local opts = {
     x = 0,
     y = 0,
-    width = W,
-    height = H,
+    width = of.getWidth(),
+    height = of.getHeight(),
     points = {},
     gap = 0,
     maxQtObjects = 4,
@@ -114,9 +114,12 @@ end
 
 function setup()
   print("QuadtreeDots")
+  compat:setup()
 end
 
 function update()
+  compat:update()
+
   Time1 = (Time1 + 1) % 360
   Time2 = (Time2 + 1) % 255
 
@@ -135,8 +138,8 @@ function update()
   if numDotsUpdated or gen.willHappen(refreshProbability) then
     for i = 1, numDots do
       local calcCenterBias = CenterBias * knob2
-      local locX = gen.randomBias(0, W, W2, calcCenterBias)
-      local locY = gen.randomBias(0, W, W2, calcCenterBias)
+      local locX = gen.randomBias(0, of.getWidth(), of.getWidth() / 2, calcCenterBias)
+      local locY = gen.randomBias(0, of.getWidth(), of.getWidth() / 2, calcCenterBias)
       Dots[i] = glm.vec4(locX, locY, DotSize, DotSize)
     end
   end
@@ -144,8 +147,8 @@ function update()
   Grid = createQtGrid{
     x = 3,
     y = 3,
-    width = W - 20,
-    height = H - 6,
+    width = of.getWidth() - 20,
+    height = of.getHeight() - 6,
     points = Dots,
     gap = 3,
   }
@@ -163,6 +166,8 @@ function update()
 end
 
 function draw()
+  compat:draw()
+
   -- -- Draw scatterplot dots
   -- of.fill()
   -- of.setColor(255, 255, 255)
