@@ -1,4 +1,4 @@
-require("eyesy")
+local compat = require("compat")
 
 -- LowResNoiseScope
 -- low-resolution bar chart oscilloscope
@@ -21,13 +21,16 @@ AMPLITUDE = 1500
 dir = 1
 
 function setup()
+  compat:setup()
   print("LowResNoiseScope")
 end
 
 function update()
+  compat:update()
 end
 
 function draw()
+  compat:draw()
   scale = AMPLITUDE * knob1
   time = (time + (dir * knob3)) % 255
   if time == 0 then

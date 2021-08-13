@@ -6,7 +6,7 @@
 -- knob4: COEF_SINE_BAR_SATURATION
 -- knob5:
 
--- require("eyesy")
+local compat = require("compat")
 local gauss = require("gaussian")
 
 -- Global constants
@@ -39,6 +39,7 @@ TranslateVecBias = glm.vec2(0, 0)
 SinTransform = 0
 
 function setup()
+  compat:setup()
   print("BarcodeScanline")
 
   -- Count the amount of screen real estate used already
@@ -62,6 +63,7 @@ function setup()
 end
 
 function update()
+  compat:update()
   -- Scroll sideways
   TranslateVec = glm.vec2(
     (TranslateVec.x + 1) * COEF_MOVEMENT_SCROLL + TranslateVecBias.x,
@@ -138,6 +140,7 @@ local function drawBar(i, rect)
 end
 
 function draw()
+  compat:draw()
   of.fill()
   of.setColor(COLOR_WHITE)
 

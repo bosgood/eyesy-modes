@@ -53,7 +53,7 @@ function update()
     -- Mark offscreen particles for collection
     if particle:isOffscreen() then
       table.insert(offscreen, i)
-      print(string.format("(%f, %f, %f, %f)", particle.rect.x, particle.rect.y, particle.rect.width, particle.rect.height))
+      -- print(string.format("(%f, %f, %f, %f)", particle.rect.x, particle.rect.y, particle.rect.width, particle.rect.height))
     end
   end
 

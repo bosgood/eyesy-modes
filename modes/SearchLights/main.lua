@@ -1,7 +1,7 @@
 -- SearchLights
 --
 
--- require("eyesy")
+local compat = require("compat")
 local lfo = require("lfo")
 
 -- Mode constants
@@ -20,10 +20,12 @@ COEF_PATH_SLICES = 2048
 SineLFO = lfo.sineGenerator(1000, 1000)
 
 function setup()
+  compat:setup()
   print("SearchLights")
 end
 
 function update()
+  compat:update()
 end
 
 local function drawWeird(color, oscillator, startPoint, endPoint)
@@ -47,6 +49,7 @@ local function drawWeird(color, oscillator, startPoint, endPoint)
 end
 
 function draw()
+  compat:draw()
   drawWeird(
     of.Color(255, 255, 255),
     SineLFO,

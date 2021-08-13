@@ -6,7 +6,7 @@
 -- knob4:
 -- knob5: COEF_ROTATION_DEG
 
--- require("eyesy")
+local compat = require("compat")
 local color = require("color")
 local lfo = require("lfo")
 
@@ -62,11 +62,13 @@ local function populateBars()
 end
 
 function setup()
+  compat:setup()
   print("RainbowBlades")
   populateBars()
 end
 
 function update()
+  compat:update()
   Time = Time + 1
 
   -- Repopulate bars if quantity is changed
@@ -88,6 +90,7 @@ function update()
 end
 
 function draw()
+  compat:draw()
   of.setBackgroundColor(COLOR_BLACK)
   of.pushMatrix()
     -- Skew entire canvas diagonally
