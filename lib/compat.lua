@@ -20,8 +20,8 @@
 --   -- In your program's draw function:
 --   compat:draw()
 
+-- Define global parameters that the EYESY also defines
 local function defineGlobals()
-  -- Define constants
   knob1 = 0.5
   knob2 = 0.5
   knob3 = 0.5
@@ -34,7 +34,12 @@ local function defineGlobals()
 end
 
 local on_eyesy = pcall(require, "eyesy")
-if not on_eyesy then
+if on_eyesy then
+  EYESY = true
+  LOAF = false
+else
+  EYESY = false
+  LOAF = true
   defineGlobals()
 end
 
@@ -42,52 +47,63 @@ local Compatibility = {
   oscReceiver = nil,
   -- Listen on same port as ofEYESY itself by default
   port = 4000,
+  -- Used to measure progress of time-based functions
+  tick = 0,
 }
 
 -- Initialize OSC listener
 function Compatibility:setup()
-  of.setBackgroundColor(of.Color.fromHsb(bgColor[1], bgColor[2], bgColor[3]))
-  local rec = osc.Receiver()
-  rec:setup(self.port)
-  self.oscReceiver = rec
+  if LOAF then
+    of.setBackgroundColor(of.Color.fromHsb(bgColor[1], bgColor[2], bgColor[3]))
+    local rec = osc.Receiver()
+    rec:setup(self.port)
+    self.oscReceiver = rec
+  end
 end
 
--- Handle any pending OSC messages
+-- Processes OSC messages to affect global parameter state
+local function processOscMessage(m)
+  -- Unpack 4-byte midi message
+  local midi = m:getArgAsMidiMessage(0)
+
+  local a = midi & 0xFF
+  local b = (midi >> 8) & 0xFF
+  local c = (midi >> 16) & 0xFF
+  local d = (midi >> 24) & 0xFF
+  print(string.format("midi: %s %s %s %s", a, b, c, d))
+
+  local ccVal = a
+  local ccId = b
+  local ccType = c
+
+  -- Only process CC messages for now
+  if ccType == 176 then
+    -- MIDI CC 20
+    if ccId == 32 then
+      knob1 = of.map(ccVal, 0, 127, 0, 1)
+    -- MIDI CC 21
+  elseif ccId == 33 then
+    knob2 = of.map(ccVal, 0, 127, 0, 1)
+    -- MIDI CC 22
+  elseif ccId == 34 then
+    knob3 = of.map(ccVal, 0, 127, 0, 1)
+    -- MIDI CC 23
+  elseif ccId == 35 then
+    knob4 = of.map(ccVal, 0, 127, 0, 1)
+    -- MIDI CC 24
+    elseif ccId == 36 then
+      knob5 = of.map(ccVal, 0, 127, 0, 1)
+    end
+  end
+end
+
 function Compatibility:update()
-  while self.oscReceiver:hasWaitingMessages() do
-    local m = osc.Message()
-    self.oscReceiver:getNextMessage(m)
-    -- Unpack 4-byte midi message
-    local midi = m:getArgAsMidiMessage(0)
-
-    local a = midi & 0xFF
-    local b = (midi >> 8) & 0xFF
-    local c = (midi >> 16) & 0xFF
-    local d = (midi >> 24) & 0xFF
-    print(string.format("midi: %s %s %s %s", a, b, c, d))
-
-    local ccVal = a
-    local ccId = b
-    local ccType = c
-
-    -- Only process CC messages for now
-    if ccType == 176 then
-      -- MIDI CC 20
-      if ccId == 32 then
-        knob1 = of.map(ccVal, 0, 127, 0, 1)
-      -- MIDI CC 21
-    elseif ccId == 33 then
-      knob2 = of.map(ccVal, 0, 127, 0, 1)
-      -- MIDI CC 22
-    elseif ccId == 34 then
-      knob3 = of.map(ccVal, 0, 127, 0, 1)
-      -- MIDI CC 23
-    elseif ccId == 35 then
-      knob4 = of.map(ccVal, 0, 127, 0, 1)
-      -- MIDI CC 24
-      elseif ccId == 36 then
-        knob5 = of.map(ccVal, 0, 127, 0, 1)
-      end
+  if LOAF then
+    -- Handle any pending OSC messages
+    while self.oscReceiver:hasWaitingMessages() do
+      local m = osc.Message()
+      self.oscReceiver:getNextMessage(m)
+      processOscMessage(self, m)
     end
   end
 end
