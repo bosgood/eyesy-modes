@@ -65,8 +65,21 @@ function draw()
   of.scale(5)
 
   of.beginShape()
-  for _, p in ipairs(state.points) do
-    of.vertex(p)
+  for i, p in ipairs(state.points) do
+    -- Modulate shape outline by combining vertex points with other values
+    local idx = i % #inC + 1
+    local audioVal = inC[idx]
+    local rx = audioVal
+    local ry = audioVal
+    local rz = audioVal
+
+    -- Purely random values - makes wiggly lines
+    -- local rx = of.random(-1, 1)
+    -- local ry = of.random(-1, 1)
+    -- local rz = of.random(-1, 1)
+
+    local rp = glm.vec3(rx, ry, rz)
+    of.vertex(p + (rp * 2))
   end
   of.endShape()
 end
