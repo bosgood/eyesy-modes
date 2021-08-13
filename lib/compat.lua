@@ -44,6 +44,7 @@ else
   LOAF = true
   defineGlobals()
 end
+local gauss = require("gaussian")
 
 local Compatibility = {
   oscReceiver = nil,
@@ -56,6 +57,7 @@ local Compatibility = {
 -- Initialize OSC listener
 function Compatibility:setup()
   if LOAF then
+    of.setWindowShape(800, 600)
     of.setBackgroundColor(of.Color.fromHsb(bgColor[1], bgColor[2], bgColor[3]))
     local rec = osc.Receiver()
     rec:setup(self.port)
@@ -107,6 +109,17 @@ function Compatibility:update()
       self.oscReceiver:getNextMessage(m)
       processOscMessage(self, m)
     end
+
+    -- Render gaussian noise into audio buffer to simulate sound
+    -- if self.tick > #gauss.values then
+    --   self.tick = 0
+    -- end
+    for i, _ in ipairs(inL) do
+      local val = gauss.randomGaussian() * 0.05
+      inL[i] = val
+      inR[i] = val
+    end
+  end
 
   -- Average L/R audio channels to provide center channel
   for i = 1, #inL do
