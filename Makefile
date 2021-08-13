@@ -2,6 +2,8 @@
 new:
 	@rm -rf modes/new
 	@cp -R template modes/new
+	@ln -s ../../lib/gaussian.lua modes/new/
+	@ln -s ../../lib/compat.lua modes/new/
 
 .PHONY: upload
 upload:

@@ -1,22 +1,36 @@
 -- New Mode
 
-require("eyesy")
+local compat = require("compat")
 
-NUM_SAMPLES = 256
-W = of.getWidth()
-H = of.getHeight()
-W2 = W / 2
-H2 = H / 2
-W4 = W / 4
-H4 = H / 4
-C = glm.vec3(W2, H2, 0)
+local function W()
+  return of.getWidth()
+end
+
+local function W2()
+  return of.getWidth() / 2
+end
+
+local function H()
+  return of.getHeight()
+end
+
+local function H2()
+  return of.getHeight() / 2
+end
+
+local function C()
+  return glm.vec3(W2(), H2(), 0)
+end
 
 function setup()
+  compat:setup()
   print("New Mode")
 end
 
 function update()
+  compat:update()
 end
 
 function draw()
+  compat:draw()
 end
