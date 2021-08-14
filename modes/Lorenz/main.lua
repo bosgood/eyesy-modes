@@ -33,12 +33,15 @@ local config = {
   -- b = 22, -- v2
   c = 8.0/3.0,
   dt = 0.01, -- original
-  continuous = false,
+  continuous = true,
+  fill = false,
   maxPointCount = 500,
   randomNoiseScale = 0.1,
-  audioScale = 2,
+  audioScale = 1,
   circleWidth = 1.5,
   rotateSpeed = 0.075,
+  scale = 10,
+  lineWidth = 10,
 }
 
 local state = {
@@ -93,13 +96,15 @@ function draw()
   state.tick = state.tick + 1
 
   of.setColor(255)
-  of.noFill()
-
   of.translate(W2(), H2())
-  of.scale(5)
+  of.scale(config.scale)
   of.rotateDeg((state.tick * config.rotateSpeed) % 360)
-  of.fill()
-  of.setLineWidth(1)
+  if config.fill then
+    of.fill()
+  else
+    of.noFill()
+  end
+  of.setLineWidth(config.lineWidth)
 
   -- of.beginShape()
   for i, p in ipairs(state.points) do
@@ -132,7 +137,7 @@ function draw()
     -- Render either a single continuous shape or a dotted trail
     local rp = glm.vec3(rx, ry, rz)
     local pos = p + (rp * config.audioScale)
-    if state.continuous then
+    if config.continuous then
       of.vertex(pos)
     else
       of.drawCircle(pos, config.circleWidth)
