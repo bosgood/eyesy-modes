@@ -21,7 +21,7 @@
 --   compat:draw()
 
 -- Define global parameters that the EYESY also defines
-local function defineGlobals()
+local function patchGlobals()
   knob1 = 0.5
   knob2 = 0.5
   knob3 = 0.5
@@ -29,10 +29,13 @@ local function defineGlobals()
   knob5 = 0.5
   inL = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
   inR = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-  -- C is the center channel, aka the average of L/R
-  inC = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
   bgColor = {255,100,0}
   trig = false
+end
+
+local function defineGlobals()
+  -- C is the center channel, aka the average of L/R
+  inC = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 end
 
 local on_eyesy = pcall(require, "eyesy")
@@ -42,8 +45,9 @@ if on_eyesy then
 else
   EYESY = false
   LOAF = true
-  defineGlobals()
+  patchGlobals()
 end
+defineGlobals()
 local gauss = require("gaussian")
 
 local Compatibility = {
@@ -65,15 +69,40 @@ function Compatibility:setup()
   end
 end
 
+local bits = {}
+function bits.bitwiseAnd(a, b)
+  local result = 0
+  local bitval = 1
+  while a > 0 and b > 0 do
+    if a % 2 == 1 and b % 2 == 1 then -- test the rightmost bits
+        result = result + bitval      -- set the current bit
+    end
+    bitval = bitval * 2 -- shift left
+    a = math.floor(a/2) -- shift right
+    b = math.floor(b/2)
+  end
+  return result
+end
+
+function bits.rshift(a,disp) -- Lua5.2 insipred
+  if disp < 0 then return bits.lshift(a, -disp) end
+  return math.floor(a % 2^32 / 2^disp)
+end
+
+function bits.lshift(a,disp) -- Lua5.2 inspired
+  if disp < 0 then return bits.rshift(a, -disp) end
+  return (a * 2^disp) % 2^32
+end
+
 -- Processes OSC messages to affect global parameter state
 local function processOscMessage(m)
   -- Unpack 4-byte midi message
   local midi = m:getArgAsMidiMessage(0)
 
-  local a = midi & 0xFF
-  local b = (midi >> 8) & 0xFF
-  local c = (midi >> 16) & 0xFF
-  local d = (midi >> 24) & 0xFF
+  local a = bits.bitwiseAnd(midi, 0xFF)
+  local b = bits.bitwiseAnd((bits.rshift(midi, 8)), 0xFF)
+  local c = bits.bitwiseAnd((bits.rshift(midi, 16)), 0xFF)
+  local d = bits.bitwiseAnd((bits.rshift(midi, 24)), 0xFF)
   print(string.format("midi: %s %s %s %s", a, b, c, d))
 
   local ccVal = a
