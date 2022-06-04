@@ -20,47 +20,47 @@ COEF_PATH_SLICES = 2048
 SineLFO = lfo.sineGenerator(1000, 1000)
 
 function setup()
-  compat:setup()
-  print("SearchLights")
+    compat:setup()
+    print("SearchLights")
 end
 
 function update()
-  compat:update()
+    compat:update()
 end
 
 local function drawWeird(color, oscillator, startPoint, endPoint)
-  local path = of.Path()
-  path:moveTo(startPoint.x, startPoint.y)
-  path:setColor(color)
-  path:setFillColor(color)
-  path:setFilled(true)
+    local path = of.Path()
+    path:moveTo(startPoint.x, startPoint.y)
+    path:setColor(color)
+    path:setFillColor(color)
+    path:setFilled(true)
 
-  for i = 1, COEF_PATH_SLICES do
-    local val = oscillator()
-    local to = glm.vec2(
-      ((endPoint.x - startPoint.x) / COEF_PATH_SLICES * i) - 1,
-      val
-    )
-    path:curveTo(to)
-  end
+    for i = 1, COEF_PATH_SLICES do
+        local val = oscillator()
+        local to = glm.vec2(
+            ((endPoint.x - startPoint.x) / COEF_PATH_SLICES * i) - 1,
+            val
+        )
+        path:curveTo(to)
+    end
 
-  path:close()
-  path:draw()
+    path:close()
+    path:draw()
 end
 
 function draw()
-  compat:draw()
-  drawWeird(
-    of.Color(255, 255, 255),
-    SineLFO,
-    glm.vec2(0, of.getHeight() / 2),
-    glm.vec2(of.getWidth(), -1)
-  )
+    compat:draw()
+    drawWeird(
+        of.Color(255, 255, 255),
+        SineLFO,
+        glm.vec2(0, of.getHeight() / 2),
+        glm.vec2(of.getWidth(), -1)
+    )
 
-  drawWeird(
-    of.Color(100, 100, 100, 100),
-    SineLFO,
-    glm.vec2(of.getHeight() / 2, 0),
-    glm.vec2(of.getWidth(), -1)
-  )
+    drawWeird(
+        of.Color(100, 100, 100, 100),
+        SineLFO,
+        glm.vec2(of.getHeight() / 2, 0),
+        glm.vec2(of.getWidth(), -1)
+    )
 end

@@ -24,54 +24,54 @@ Rot = 0
 Particles = {}
 
 function particleRect()
-  return of.Rectangle(
-    of.getWidth() / 2,
-    of.getHeight() / 2,
-    COEF_PARTICLE_SIZE,
-    COEF_PARTICLE_SIZE
-  )
+    return of.Rectangle(
+        of.getWidth() / 2,
+        of.getHeight() / 2,
+        COEF_PARTICLE_SIZE,
+        COEF_PARTICLE_SIZE
+    )
 end
 
 function setup()
-  print("BWNotebook")
+    print("BWNotebook")
 
-  for _ = 1, COEF_NUM_PARTICLES do
-    table.insert(Particles, Particle:new({
-      rect = particleRect(),
-    }))
-  end
+    for _ = 1, COEF_NUM_PARTICLES do
+        table.insert(Particles, Particle:new({
+            rect = particleRect(),
+        }))
+    end
 end
 
 function update()
-  Rot = (Rot + 1) % 350
+    Rot = (Rot + 1) % 350
 
-  local offscreen = {}
-  for i, particle in ipairs(Particles) do
-    particle.rect.x = particle.rect.x + (gauss.randomGaussian() * COEF_GAUSS_SCALE)
-    particle.rect.y = particle.rect.y + (gauss.randomGaussian() * COEF_GAUSS_SCALE)
+    local offscreen = {}
+    for i, particle in ipairs(Particles) do
+        particle.rect.x = particle.rect.x + (gauss.randomGaussian() * COEF_GAUSS_SCALE)
+        particle.rect.y = particle.rect.y + (gauss.randomGaussian() * COEF_GAUSS_SCALE)
 
-    -- Mark offscreen particles for collection
-    if particle:isOffscreen() then
-      table.insert(offscreen, i)
-      -- print(string.format("(%f, %f, %f, %f)", particle.rect.x, particle.rect.y, particle.rect.width, particle.rect.height))
+        -- Mark offscreen particles for collection
+        if particle:isOffscreen() then
+            table.insert(offscreen, i)
+            -- print(string.format("(%f, %f, %f, %f)", particle.rect.x, particle.rect.y, particle.rect.width, particle.rect.height))
+        end
     end
-  end
 
-  -- Recycle any offscreen particles
-  for _, i in ipairs(offscreen) do
-    table.remove(Particles, i)
-    table.insert(Particles, Particle:new({
-      rect = particleRect(),
-    }))
-  end
+    -- Recycle any offscreen particles
+    for _, i in ipairs(offscreen) do
+        table.remove(Particles, i)
+        table.insert(Particles, Particle:new({
+            rect = particleRect(),
+        }))
+    end
 end
 
 function draw()
-  of.pushMatrix()
+    of.pushMatrix()
     -- of.translate(Rot, Rot, Rot)
     -- of.rotateDeg(Rot)
     for _, particle in ipairs(Particles) do
-      particle:draw()
+        particle:draw()
     end
-  of.popMatrix()
+    of.popMatrix()
 end

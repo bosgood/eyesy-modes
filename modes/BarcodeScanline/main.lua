@@ -39,112 +39,112 @@ TranslateVecBias = glm.vec2(0, 0)
 SinTransform = 0
 
 function setup()
-  compat:setup()
-  print("BarcodeScanline")
+    compat:setup()
+    print("BarcodeScanline")
 
-  -- Count the amount of screen real estate used already
-  local usedWidth = 0
+    -- Count the amount of screen real estate used already
+    local usedWidth = 0
 
-  -- Add bars until screen width exhausted
-  while true do
-    local width = math.abs(gauss.randomGaussian()) * COEF_BAR_WIDTH
-    usedWidth = usedWidth + width
-    -- Place bars in sequence one after another across the screen
-    local bar = of.Rectangle(usedWidth, 0, width, H)
-    table.insert(Bars, bar)
+    -- Add bars until screen width exhausted
+    while true do
+        local width = math.abs(gauss.randomGaussian()) * COEF_BAR_WIDTH
+        usedWidth = usedWidth + width
+        -- Place bars in sequence one after another across the screen
+        local bar = of.Rectangle(usedWidth, 0, width, H)
+        table.insert(Bars, bar)
 
-    -- Stop once all space has been filled
-    if usedWidth >= W then
-      break
+        -- Stop once all space has been filled
+        if usedWidth >= W then
+            break
+        end
     end
-  end
 
-  of.setBackgroundColor(COLOR_BLACK)
+    of.setBackgroundColor(COLOR_BLACK)
 end
 
 function update()
-  compat:update()
-  -- Scroll sideways
-  TranslateVec = glm.vec2(
-    (TranslateVec.x + 1) * COEF_MOVEMENT_SCROLL + TranslateVecBias.x,
-    TranslateVec.y + TranslateVecBias.y
-  )
+    compat:update()
+    -- Scroll sideways
+    TranslateVec = glm.vec2(
+        (TranslateVec.x + 1) * COEF_MOVEMENT_SCROLL + TranslateVecBias.x,
+        TranslateVec.y + TranslateVecBias.y
+    )
 
-  -- Keep track of the amount of bars offscreen so corrections can be made
-  local numBarsOffscreenLeft = 0
-  local numBarsOffscreenRight = 0
+    -- Keep track of the amount of bars offscreen so corrections can be made
+    local numBarsOffscreenLeft = 0
+    local numBarsOffscreenRight = 0
 
-  for _, rect in ipairs(Bars) do
-    -- Resize with screen height
-    rect.height = of.getHeight()
+    for _, rect in ipairs(Bars) do
+        -- Resize with screen height
+        rect.height = of.getHeight()
 
-    local wiggle = COEF_MOVEMENT_WIGGLE * gauss.randomGaussian()
-    -- Simulate TV out of sync by introducing random lateral movement
-    rect.x = rect.x + wiggle
+        local wiggle = COEF_MOVEMENT_WIGGLE * gauss.randomGaussian()
+        -- Simulate TV out of sync by introducing random lateral movement
+        rect.x = rect.x + wiggle
 
-    -- Slowly scroll across the screen
-    rect:translate(TranslateVec)
+        -- Slowly scroll across the screen
+        rect:translate(TranslateVec)
 
-    if rect.x < 0 then
-      numBarsOffscreenLeft = numBarsOffscreenLeft + 1
+        if rect.x < 0 then
+            numBarsOffscreenLeft = numBarsOffscreenLeft + 1
+        end
+        if rect.x > of.getWidth() then
+            numBarsOffscreenRight = numBarsOffscreenRight + 1
+        end
     end
-    if rect.x > of.getWidth() then
-      numBarsOffscreenRight = numBarsOffscreenRight + 1
+
+    -- Correct once a certain threshold has been passed
+    if numBarsOffscreenLeft > (COEF_PCT_CORRECT_BARS_OFFSCREEN * #Bars) then
+        TranslateVecBias = glm.vec2(COEF_TRANSLATE_VEC_BIAS, TranslateVecBias.y)
+    elseif numBarsOffscreenRight > (COEF_PCT_CORRECT_BARS_OFFSCREEN * #Bars) then
+        TranslateVecBias = glm.vec2(-COEF_TRANSLATE_VEC_BIAS, TranslateVecBias.y)
     end
-  end
 
-  -- Correct once a certain threshold has been passed
-  if numBarsOffscreenLeft > (COEF_PCT_CORRECT_BARS_OFFSCREEN * #Bars) then
-    TranslateVecBias = glm.vec2(COEF_TRANSLATE_VEC_BIAS, TranslateVecBias.y)
-  elseif numBarsOffscreenRight > (COEF_PCT_CORRECT_BARS_OFFSCREEN * #Bars) then
-    TranslateVecBias = glm.vec2(-COEF_TRANSLATE_VEC_BIAS, TranslateVecBias.y)
-  end
+    -- Reset correction once all bars back in view
+    if numBarsOffscreenLeft == 0 and numBarsOffscreenRight == 0 then
+        TranslateVecBias = glm.vec2(0, TranslateVecBias.y)
+    end
 
-  -- Reset correction once all bars back in view
-  if numBarsOffscreenLeft == 0 and numBarsOffscreenRight == 0 then
-    TranslateVecBias = glm.vec2(0, TranslateVecBias.y)
-  end
-
-  -- Let the sine wave effect be modulated by a monotonically increasing value
-  SinTransform = SinTransform + COEF_SINE_TRANSFORM
+    -- Let the sine wave effect be modulated by a monotonically increasing value
+    SinTransform = SinTransform + COEF_SINE_TRANSFORM
 end
 
 -- Draws a barcode bar; can be either a rectangle or a wide sine wave
 local function drawBar(i, rect)
-  -- Bar code coloring - skip bars matching bgcolor
-  if i % 2 == 0 then
-    return
-  end
+    -- Bar code coloring - skip bars matching bgcolor
+    if i % 2 == 0 then
+        return
+    end
 
-  of.beginShape()
+    of.beginShape()
     -- Cut my sine into pieces
     -- This is my last resort
     local steps = rect.height / 3
     local step = rect.height / steps
     for x = 0, steps do
-      local color = of.Color.fromHsb(
-        x + SinTransform % 255,
-        COEF_SINE_BAR_SATURATION,
-        COLOR_WHITE:getBrightness()
-      )
-      of.setColor(color)
+        local color = of.Color.fromHsb(
+            x + SinTransform % 255,
+            COEF_SINE_BAR_SATURATION,
+            COLOR_WHITE:getBrightness()
+        )
+        of.setColor(color)
 
-      local wavePoint = math.sin(x + SinTransform) * COEF_SINE_INFLUENCE * SinTransform
-      -- A sine wave the width of each bar
-      local v1 = glm.vec2(rect.x + wavePoint, step * x)
-      local v2 = glm.vec2(rect.x + wavePoint + rect.width, step * x)
-      of.vertex(v1)
-      of.vertex(v2)
+        local wavePoint = math.sin(x + SinTransform) * COEF_SINE_INFLUENCE * SinTransform
+        -- A sine wave the width of each bar
+        local v1 = glm.vec2(rect.x + wavePoint, step * x)
+        local v2 = glm.vec2(rect.x + wavePoint + rect.width, step * x)
+        of.vertex(v1)
+        of.vertex(v2)
     end
-  of.endShape()
+    of.endShape()
 end
 
 function draw()
-  compat:draw()
-  of.fill()
-  of.setColor(COLOR_WHITE)
+    compat:draw()
+    of.fill()
+    of.setColor(COLOR_WHITE)
 
-  for i, rect in ipairs(Bars) do
-    drawBar(i, rect)
-  end
+    for i, rect in ipairs(Bars) do
+        drawBar(i, rect)
+    end
 end
